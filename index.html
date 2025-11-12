@@ -5,13 +5,79 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Колесо команд — Минимум</title>
 <style>
-body { font-family:sans-serif; display:flex; flex-direction:column; align-items:center; padding:20px; background:#f0f0f0; }
-#wheel { width:420px; height:420px; border-radius:50%; border:6px solid #222; background:#fff; }
-.wheel-wrap { position:relative; margin-bottom:12px; }
-.btn { padding:10px 14px; margin:4px; border:none; border-radius:6px; background:#f39c12; color:#fff; cursor:pointer; }
-.elim-log { max-height:150px; overflow:auto; width:420px; background:#fff; border:1px solid #ccc; border-radius:6px; padding:6px; }
-.wheel-pointer { position:absolute; width:0; height:0; border-top:12px solid transparent; border-bottom:12px solid transparent; border-right:20px solid red; top:50%; transform:translateY(-50%); right:-10px; }
+body {
+  font-family:sans-serif;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px;
+  background:#f0f0f0;
+}
+.wheel-wrap {
+  position:relative;
+  margin-bottom:12px;
+}
+#wheel {
+  width:420px;
+  height:420px;
+  border-radius:50%;
+  border:6px solid #222;
+  background:#fff;
+}
+.wheel-pointer {
+  position:absolute;
+  width:0;
+  height:0;
+  border-top:12px solid transparent;
+  border-bottom:12px solid transparent;
+  border-right:20px solid red;
+  top:50%;
+  transform:translateY(-50%);
+  right:-10px;
+}
+.btn {
+  padding:10px 14px;
+  margin:4px;
+  border:none;
+  border-radius:6px;
+  background:#f39c12;
+  color:#fff;
+  cursor:pointer;
+  font-size:16px;
+}
+.elim-log {
+  max-height:150px;
+  overflow:auto;
+  width:420px;
+  background:#fff;
+  border:1px solid #ccc;
+  border-radius:6px;
+  padding:6px;
+  font-size:14px;
+}
 #nextBtn { display:none; margin-top:10px; background:#27ae60; }
+
+/* Адаптив для мобильных */
+@media (max-width:480px){
+  #wheel {
+    width:90vw;
+    height:90vw;
+  }
+  .elim-log {
+    width:90vw;
+    font-size:12px;
+  }
+  .btn {
+    font-size:14px;
+    padding:8px 12px;
+  }
+  .wheel-pointer {
+    border-top:8px solid transparent;
+    border-bottom:8px solid transparent;
+    border-right:16px solid red;
+    right:-8px;
+  }
+}
 </style>
 </head>
 <body>
@@ -66,7 +132,8 @@ function drawWheel(rotation = 0){
     wctx.translate(cx,cy);
     wctx.rotate(start + angle/2);
     wctx.fillStyle = '#111';
-    wctx.font = 'bold 14px sans-serif';
+    const fontSize = window.innerWidth<480 ? 12 : 14;
+    wctx.font = `bold ${fontSize}px sans-serif`;
     wctx.textAlign = 'right';
     wctx.fillText(pool[i].role, r-12, 6);
     wctx.restore();
