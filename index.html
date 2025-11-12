@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Колесо команд — Минимум</title>
+<style>
+body { font-family:sans-serif; display:flex; flex-direction:column; align-items:center; padding:20px; background:#f0f0f0; }
+#wheel { width:420px; height:420px; border-radius:50%; border:6px solid #222; background:#fff; }
+.wheel-wrap { position:relative; margin-bottom:12px; }
+.btn { padding:10px 14px; margin:4px; border:none; border-radius:6px; background:#f39c12; color:#fff; cursor:pointer; }
+.elim-log { max-height:150px; overflow:auto; width:420px; background:#fff; border:1px solid #ccc; border-radius:6px; padding:6px; }
+.wheel-pointer { position:absolute; width:0; height:0; border-top:12px solid transparent; border-bottom:12px solid transparent; border-right:20px solid red; top:50%; transform:translateY(-50%); right:-10px; }
+#nextBtn { display:none; margin-top:10px; background:#27ae60; }
+</style>
+</head>
+<body>
+<div class="wheel-wrap">
+  <canvas id="wheel" width="420" height="420"></canvas>
+  <div class="wheel-pointer"></div>
+</div>
+<div>
+  <button id="spinBtn" class="btn">Крутить (исключить)</button>
+  <button id="resetBtn" class="btn">Сбросить</button>
+  <button id="nextBtn" class="btn" onclick="goNext()">➡️ Дальше</button>
+</div>
+<div class="elim-log" id="elimLog"></div>
+
+<script>
+const initialTeams = [
+  {id:1, role:"Молодая семья"},
+  {id:2, role:"Фрилансер"},
+  {id:3, role:"Предприниматель"},
+  {id:4, role:"Врач"},
+  {id:5, role:"Водитель"},
+  {id:6, role:"Пенсионер"}
+];
+let teams = JSON.parse(JSON.stringify(initialTeams));
+let wheelPool = teams.map(t=>t.id);
+
+const wheelCanvas = document.getElementById('wheel');
+const wctx = wheelCanvas.getContext('2d');
+const elimLog = document.getElementById('elimLog');
+const spinBtn = document.getElementById('spinBtn');
+const resetBtn = document.getElementById('resetBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+function findTeamById(id){ return teams.find(t=>t.id===id); }
+
+function drawWheel(rotation = 0){
+  const pool = wheelPool.map(id => findTeamById(id));
+  const n = pool.length || 1;
+  const cx = wheelCanvas.width/2, cy = wheelCanvas.height/2, r = Math.min(cx,cy)-6;
+  wctx.clearRect(0,0,wheelCanvas.width,wheelCanvas.height);
+  const angle = 2*Math.PI / n;
+  for(let i=0;i<n;i++){
+    const start = i*angle + rotation;
+    wctx.beginPath();
+    wctx.moveTo(cx,cy);
+    wctx.arc(cx,cy,r,start,start+angle);
+    wctx.closePath();
+    wctx.fillStyle = i%2===0 ? `hsl(${i*40},60%,85%)` : `hsl(${i*40+20},60%,90%)`;
+    wctx.fill();
+    wctx.strokeStyle = '#222'; wctx.stroke();
+    wctx.save();
+    wctx.translate(cx,cy);
+    wctx.rotate(start + angle/2);
+    wctx.fillStyle = '#111';
+    wctx.font = 'bold 14px sans-serif';
+    wctx.textAlign = 'right';
+    wctx.fillText(pool[i].role, r-12, 6);
+    wctx.restore();
+  }
+}
+
+function logElimination(text){
+  const d = document.createElement('div');
+  d.textContent = `${new Date().toLocaleTimeString()} — ${text}`;
+  elimLog.prepend(d);
+}
+
+let spinning = false;
+function spinAndEliminate(){
+  if(spinning || wheelPool.length<=1) return;
+  spinning = true;
+  const n = wheelPool.length;
+  const rotations = 4 + Math.floor(Math.random()*3);
+  const finalIndex = Math.floor(Math.random()*n);
+  const totalFrames = 90;
+  let frame=0;
+  const startRotation = 0;
+  const anglePer = 2*Math.PI/n;
+  const targetRotation = -(finalIndex*anglePer + anglePer/2);
+
+  function step(){
+    frame++;
+    const t = frame/totalFrames;
+    const ease = 1 - Math.pow(1-t,3);
+    const curRot = startRotation + (rotations*2*Math.PI + Math.abs(targetRotation))*ease;
+    drawWheel(-curRot);
+    if(frame<totalFrames) requestAnimationFrame(step);
+    else {
+      const eliminatedId = wheelPool[finalIndex];
+      const eliminatedTeam = findTeamById(eliminatedId);
+      wheelPool = wheelPool.filter(id=>id!==eliminatedId);
+      logElimination(`Выбывает: ${eliminatedTeam.role}`);
+      spinning=false;
+      drawWheel();
+      if(wheelPool.length===1){
+        logElimination(`Осталась команда: ${findTeamById(wheelPool[0]).role}`);
+        nextBtn.style.display = 'inline-block';
+      }
+    }
+  }
+  step();
+}
+
+function resetWheel(){
+  teams = JSON.parse(JSON.stringify(initialTeams));
+  wheelPool = teams.map(t=>t.id);
+  elimLog.innerHTML='';
+  nextBtn.style.display='none';
+  drawWheel();
+}
+
+function goNext(){
+  window.location.href = 'financial_bunker.html';
+}
+
+spinBtn.addEventListener('click', spinAndEliminate);
+resetBtn.addEventListener('click', resetWheel);
+
+drawWheel();
+</script>
+</body>
+</html>
