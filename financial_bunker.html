@@ -290,19 +290,24 @@
             100% { opacity: 1; }
         }
         
-                @media screen and (max-width: 768px) {
-            body { padding: 10px; }
-            .container { padding: 20px; border-radius: 15px; }
-            .game-header { font-size: 1.2em; padding: 15px; }
-            .teams-grid { gap: 10px; }
-            .team-card { padding: 15px; font-size: 0.9em; }
-            .insurance-card { font-size: 0.75em; padding: 8px; }
-            .controls { flex-direction: column; gap: 10px; }
-            .btn { font-size: 1em; padding: 12px 20px; }
-            .timer { font-size: 1.5em; }
-            .event-card { font-size: 0.9em; padding: 20px; }
-            .combo-counter { font-size: 0.9em; padding: 8px 12px; }
-            .achievement { font-size: 1.2em; padding: 15px 25px; }
+        @media screen and (max-width: 768px) {
+            .teams-grid {
+                display: flex;
+                overflow-x: auto;
+                gap: 15px;                 
+                padding-bottom: 10px;
+            }
+            .team-card {
+                flex: 0 0 80%;
+                min-width: 250px;
+            }
+            .teams-grid::-webkit-scrollbar {
+                display: none;
+            }
+            .teams-grid {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
         }
     </style>
 </head>
