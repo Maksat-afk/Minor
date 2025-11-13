@@ -291,17 +291,10 @@
         }
         
         @media screen and (max-width: 768px) {
-            .teams-grid {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-                overflow-y: auto;
-            }
-
-            .team-card {
-                width: 90%;
-                max-width: 400px;
+            .insurance-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px;
             }
         }
     </style>
